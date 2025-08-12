@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Foodio</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ffeede;
+        color: #000;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 50px;
+        background-color: #ffeede;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .logo {
+        font-weight: 900;
+        font-size: 22px;
+        color: black;
+      }
+      .logo span {
+        color: #ff6a00;
+      }
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 25px;
+        margin: 0;
+        padding: 0;
+        font-weight: 500;
+        font-size: 14px;
+      }
+      nav ul li {
+        position: relative;
+        cursor: pointer;
+      }
+      nav ul li a {
+        color: black;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-block;
+        padding: 5px 0;
+      }
+      nav ul li a:hover {
+        color: #ff6a00;
+      }
+      nav ul li.active a {
+        color: #ff6a00;
+        font-weight: 700;
+      }
+      nav ul li.active::after {
+        content: "";
+        position: absolute;
+        bottom: -7px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #ff6a00;
+        border-radius: 2px;
+      }
+      .auth {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 14px;
+      }
+      .auth .sign-in {
+        cursor: pointer;
+        color: black;
+      }
+      .auth .sign-up {
+        background-color: #ff6a00;
+        border: none;
+        color: white;
+        padding: 7px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .auth-form {
+        background: white;
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 200px;
+      }
+
+      .auth-form input {
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .auth-form button {
+        background-color: #ff6a00;
+        color: white;
+        border: none;
+        padding: 8px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .auth-form button:hover {
+        background-color: #e65a00;
+      }
+
+      main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 40px 50px;
+        gap: 30px;
+        min-height: 80vh;
+      }
+      .content {
+        max-width: 500px;
+      }
+      .content h1 {
+        font-size: 40px;
+        font-weight: 900;
+        margin: 0 0 20px 0;
+      }
+      .content p {
+        font-size: 16px;
+        margin-bottom: 30px;
+        line-height: 1.4;
+        color: #333;
+      }
+      .btn-explore {
+        background-color: #ff6a00;
+        color: white;
+        padding: 12px 25px;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .btn-explore:hover {
+        background-color: #e65a00;
+      }
+      .image {
+        flex-shrink: 0;
+        width: 300px;
+        height: 300px;
+        border-radius: 150px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        animation: spin 5s linear infinite;
+      }
+      /* منوی بخش Our Menu */
+      .food-menu {
+        padding: 40px 50px;
+        background-color: #fff7f0;
+        text-align: center;
+      }
+      .food-menu h2 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        color: #ff6a00;
+      }
+      .menu-categories {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin-bottom: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 18px;
+        color: #555;
+      }
+      .menu-categories .category-item.active {
+        color: #ff6a00;
+        border-bottom: 3px solid #ff6a00;
+        padding-bottom: 5px;
+      }
+      .menu-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+      }
+      .menu-list[style*="display: none"] {
+        display: none !important;
+      }
+      .menu-item {
+        background: white;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 15px;
+        width: 220px;
+        text-align: center;
+      }
+      .menu-item img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: 0.3s;
+      }
+      .message {
+        transition: opacity 0.3s ease;
+      }
+
+      .menu-item img:hover {
+        transform: translateY(-4px);
+      }
+      @media (max-width: 900px) {
+        main {
+          flex-direction: column;
+          padding: 30px 20px;
+        }
+        .image {
+          width: 100%;
+          height: 250px;
+          border-radius: 20px;
+          margin-top: 30px;
+        }
+        .content h1 {
+          font-size: 32px;
+        }
+        .content {
+          max-width: 100%;
+        }
+        .menu-categories {
+          flex-direction: column;
+          gap: 15px;
+        }
+        .menu-list {
+          flex-direction: column;
+          gap: 20px;
+        }
+        .menu-item {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">فود<span>یو</span></div>
+      <nav>
+        <ul>
+          <li class="active"><a href="#">خانه</a></li>
+          <li><a href="#our-menu">منو</a></li>
+          <li><a href="#service">خدمات</a></li>
+          <li><a href="#about-us">درباره ما</a></li>
+        </ul>
+      </nav>
+      <div class="auth">
+        <div class="sign-in">ورود</div>
+        <button class="sign-up">ثبت‌ نام</button>
+
+        <!-- فرم‌های مخفی -->
+        <div
+          id="sign-in-form"
+          class="auth-form"
+          style="display: none; margin-top: 10px"
+        >
+          <input type="email" placeholder="ایمیل" required />
+          <input type="password" placeholder="رمز" required />
+          <button type="submit">ورود</button>
+        </div>
+
+        <div
+          id="sign-up-form"
+          class="auth-form"
+          style="display: none; margin-top: 10px"
+        >
+          <input type="text" placeholder="نام" required />
+          <input type="email" placeholder="ایمیل" required />
+          <input type="password" placeholder="رمز" required />
+          <button type="submit">ثبت‌ نام</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="content">
+        <h1>سفارش بهترین<br />غذا در هر زمان</h1>
+        <p>
+          غذای خوشمزه ما منتظر شماست،<br />همیشه با مواد تازه در کنار شما هستیم.
+        </p>
+        <button class="btn-explore">مشاهده منو</button>
+      </div>
+      <div class="image">
+        <img src="pexels-pixabay-208537.jpg" alt="fried chicken" />
+      </div>
+    </main>
+    <!-- شروع بخش منو  -->
+    <section id="our-menu" class="food-menu">
+      <h2>منوی ما</h2>
+
+      <!-- آیتم منو -->
+      <div class="menu-items">
+        <!-- پیش‌غذا -->
+        <div class="menu-list" id="starters">
+          <div class="menu-item">
+            <img src="pexels-deruzzi-6546181.jpg" alt="سالاد تازه" />
+            <h3>سالاد تازه</h3>
+            <p>سالادی رنگارنگ و سالم با سبزیجات تازه و سس مخصوص.</p>
+          </div>
+          <div class="menu-item">
+            <img src="istockphoto-481765835-1024x1024.jpg" alt="بروسکتا" />
+            <h3>بروسکتا</h3>
+            <p>نان تست شده با گوجه تازه، ریحان و روغن زیتون.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-valeriya-27098513.jpg" alt="سوپ گوجه‌فرنگی" />
+            <h3>سوپ گوجه‌فرنگی</h3>
+            <p>سوپی گرم و خوش‌عطر با گوجه تازه و سبزیجات معطر.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-pixabay-434283.jpg" alt="دستچین پیش‌غذا" />
+            <h3>پیش‌غذاها</h3>
+            <p>مجموعه‌ای از پیش‌غذاهای خوشمزه برای شروع وعده.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-owpictures-106343.jpg" alt="مرغ گریل شده" />
+            <h3>مرغ</h3>
+            <p>برش‌های مرغ طعم‌دار و گریل‌شده با ادویه‌های معطر.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-1155579-2871755.jpg" alt="گوشت بره" />
+            <h3>بره</h3>
+            <p>گوشت بره نرم و لذیذ با طعمی سنتی و دلپذیر.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="pexels-nano-erdozain-120534369-28460875.jpg"
+              alt="سویچه"
+            />
+            <h3>سویچه</h3>
+            <p>غذای دریایی تازه با آب‌لیمو و سبزیجات معطر.</p>
+          </div>
+          <div class="menu-item">
+            <img src="istockphoto-1208761682-1024x1024.jpg" alt="هوموس" />
+            <h3>هوموس</h3>
+            <p>پوره نخود با ارده، روغن زیتون و ادویه‌های شرقی.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-n-voitkevich-6275178.jpg" alt="مزّه" />
+            <h3>مزّه</h3>
+            <p>مجموعه‌ای از پیش‌غذاهای مدیترانه‌ای کوچک و خوش‌طعم.</p>
+          </div>
+          <div class="menu-item">
+            <img src="pexels-pixabay-248444.jpg" alt="سوشی" />
+            <h3>سوشی</h3>
+            <p>لقمه‌های برنج ژاپنی با ماهی تازه و سبزیجات.</p>
+          </div>
+        </div>
+
+        <!-- غذای اصلی -->
+        <div class="menu-list" id="main-course" style="display: none">
+          <div class="menu-item">
+            <img src="main/pexels-vinkay-33332968.jpg" alt="مرغ گریل شده" />
+            <h3>مرغ گریل شده</h3>
+            <p>مرغ آبدار و طعم‌دار، پخته شده روی زغال.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="main/pexels-richard-l-2150581203-32722832.jpg"
+              alt="ماکرل"
+            />
+            <h3>ماکرل</h3>
+            <p>ماهی ماکرل تازه با لیمو و سبزیجات.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="main/pexels-polinachistyakova-18252686.jpg"
+              alt="ساردین"
+            />
+            <h3>ساردین</h3>
+            <p>ساردین کبابی با طعمی لذیذ و اصیل.</p>
+          </div>
+          <div class="menu-item">
+            <img src="main/pexels-miyatavictor-3682837.jpg" alt="پیتزا" />
+            <h3>پیتزا</h3>
+            <p>پیتزای تازه با پنیر کش‌دار و مواد دلخواه.</p>
+          </div>
+          <div class="menu-item">
+            <img src="main/pexels-valeriya-1639562.jpg" alt="همبرگر" />
+            <h3>همبرگر</h3>
+            <p>برگر گوشت آبدار با نان تازه و سبزیجات.</p>
+          </div>
+          <div class="menu-item">
+            <img src="main/pexels-valeriya-1251208.jpg" alt="استیک" />
+            <h3>استیک</h3>
+            <p>گوشت گوساله آبدار، گریل شده تا حد دلخواه شما.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="main/pexels-aleson-padilha-945919991-33323279.jpg"
+              alt="پاستا"
+            />
+            <h3>پاستا</h3>
+            <p>پاستای ایتالیایی با سس تازه و خوش‌طعم.</p>
+          </div>
+          <div class="menu-item">
+            <img src="main/pexels-farhad-8696466.jpg" alt="تندرلوین" />
+            <h3>تندرلوین</h3>
+            <p>برش نرم و لذیذ گوشت گوساله با ادویه‌های خاص.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="main/pexels-annelies-brouw-976954-3223494.jpg"
+              alt="راک بره"
+            />
+            <h3>راک بره</h3>
+            <p>دنده‌های بره کبابی با طعمی بی‌نظیر.</p>
+          </div>
+          <div class="menu-item">
+            <img src="main/istockphoto-1316810037-1024x1024.jpg" alt="کیپر" />
+            <h3>کیپر</h3>
+            <p>ماهی دودی خوش‌طعم همراه با سبزیجات.</p>
+          </div>
+        </div>
+
+        <!-- دسر -->
+        <div class="menu-list" id="desserts" style="display: none">
+          <div class="menu-item">
+            <img src="des/pexels-abhinavcoca-291528.jpg" alt="کیک شکلاتی" />
+            <h3>کیک شکلاتی</h3>
+            <p>کیک نرم و خوش‌طعم با لایه‌های شکلاتی.</p>
+          </div>
+          <div class="menu-item">
+            <img src="des/pexels-yaroslav-shuraev-4472870.jpg" alt="تیرامیسو" />
+            <h3>تیرامیسو</h3>
+            <p>دسری ایتالیایی با قهوه و خامه ماسکارپونه.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="des/pexels-max-griss-16866522-11397866.jpg"
+              alt="پانا کوتا"
+            />
+            <h3>پانا کوتا</h3>
+            <p>دسر خامه‌ای ایتالیایی با طعمی ملایم.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="des/pexels-marceloverfe-13059624.jpg"
+              alt="چیزکیک بدون پخت"
+            />
+            <h3>چیزکیک بدون پخت</h3>
+            <p>چیزکیک خامه‌ای با بیسکویت کره‌ای.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="des/pexels-shameel-mukkath-3421394-5640053.jpg"
+              alt="کرِم بروله"
+            />
+            <h3>کرِم بروله</h3>
+            <p>دسر فرانسوی با لایه کاراملی ترد.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="des/pexels-ella-olsson-572949-3026810.jpg"
+              alt="موس شکلاتی"
+            />
+            <h3>موس شکلاتی</h3>
+            <p>دسر سبک و خامه‌ای با شکلات تلخ.</p>
+          </div>
+          <div class="menu-item">
+            <img src="des/pexels-cottonbro-3943185.jpg" alt="ژله میوه‌ای" />
+            <h3>ژله میوه‌ای</h3>
+            <p>ژله رنگارنگ با تکه‌های میوه تازه.</p>
+          </div>
+          <div class="menu-item">
+            <img src="des/pexels-koshi-887853.jpg" alt="براونی" />
+            <h3>براونی</h3>
+            <p>کیک شکلاتی غلیظ و فشرده با مغز گردو.</p>
+          </div>
+          <div class="menu-item">
+            <img src="des/pexels-roman-odintsov-6148198.jpg" alt="پای سیب" />
+            <h3>پای سیب</h3>
+            <p>پای ترد با سیب کاراملی و دارچین.</p>
+          </div>
+          <div class="menu-item">
+            <img
+              src="des/pexels-hilal-53444166-27637633.jpg"
+              alt="کاسترد وانیلی"
+            />
+            <h3>کاسترد وانیلی</h3>
+            <p>دسر خامه‌ای با عطر وانیل طبیعی.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="service"
+      class="service-section"
+      style="padding: 40px 50px; background-color: #fff7f0; text-align: center"
+    >
+      <style>
+        .toast {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #ff7f50;
+          color: white;
+          padding: 10px 15px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          font-family: sans-serif;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 0.4s ease, transform 0.4s ease;
+          z-index: 1000;
+        }
+        .toast.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      </style>
+
+      <div id="toast-service" class="toast">
+        فودیو: این بخش هنوز تکمیل نشده است. از صبر و شکیبایی شما ممنونیم.
+      </div>
+
+      <script>
+        const toastService = document.getElementById("toast-service");
+
+        document.querySelector("#service").addEventListener("click", () => {
+          toastService.classList.add("show");
+
+          setTimeout(() => {
+            toastService.classList.remove("show");
+          }, 3000); // بعد از ۳ ثانیه محو می‌شود
+        });
+      </script>
+
+      <h2
+        style="
+          font-size: 32px;
+          font-weight: 700;
+          margin-bottom: 30px;
+          color: #ff6a00;
+        "
+      >
+        خدمات ما
+      </h2>
+      <div
+        style="
+          display: flex;
+          gap: 25px;
+          justify-content: center;
+          flex-wrap: wrap;
+        "
+      >
+        <div
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            transition: transform 0.3s ease;
+            cursor: default;
+          "
+        >
+          <h3 style="margin-bottom: 10px; color: #333">تحویل سریع</h3>
+          <p style="color: #555; font-size: 14px; line-height: 1.4">
+            «غذای خود را سریع و تازه، درست دمِ درِ خانه تحویل بگیرید.»
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            transition: transform 0.3s ease;
+            cursor: default;
+          "
+        >
+          <h3 style="margin-bottom: 10px; color: #333">رزرو میز</h3>
+          <p style="color: #555; font-size: 14px; line-height: 1.4">
+            «به‌راحتی میز خود را رزرو کنید و یک تجربه‌ی عالی از صرف غذا داشته
+            باشید.»
+          </p>
+        </div>
+        <div
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            transition: transform 0.3s ease;
+            cursor: default;
+          "
+        >
+          <h3 style="margin-bottom: 10px; color: #333">«پشتیبانی مشتری»</h3>
+          <p style="color: #555; font-size: 14px; line-height: 1.4">
+            «ما اینجاییم تا به پرسش‌های شما پاسخ دهیم و هر مشکلی را برطرف کنیم.»
+          </p>
+        </div>
+      </div>
+    </section>
+    <section id="about-us" style="padding: 50px; background-color: #fff7f0">
+      <div
+        style="display: flex; flex-wrap: wrap; align-items: center; gap: 40px"
+      >
+        <!-- تصویر -->
+        <div style="flex: 1; min-width: 300px">
+          <img
+            src="about.jpg"
+            alt="About Foodio"
+            style="
+              width: 100%;
+              border-radius: 15px;
+              box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            "
+          />
+        </div>
+
+        <!-- متن معرفی -->
+        <div style="flex: 1; min-width: 300px">
+          <h2
+            style="
+              font-size: 32px;
+              font-weight: 700;
+              color: #ff6a00;
+              margin-bottom: 15px;
+            "
+          >
+            درباره ما
+          </h2>
+          <p
+            style="
+              color: #333;
+              font-size: 16px;
+              line-height: 1.6;
+              margin-bottom: 25px;
+            "
+          >
+            «به <strong>فودیو</strong> خوش آمدید! ما معتقدیم غذا فقط یک وعده
+            نیست — بلکه یک تجربه است. سرآشپزهای ما فقط از تازه‌ترین مواد استفاده
+            می‌کنند تا غذاهایی بسازند که مردم را کنار هم جمع کند. از پیش‌غذا تا
+            دسر، هر بشقاب با عشق و دقت تهیه می‌شود.»
+          </p>
+          <button
+            id="btn-about"
+            style="
+              background-color: #ff6a00;
+              color: white;
+              padding: 12px 25px;
+              font-weight: 600;
+              font-size: 14px;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+            "
+          >
+            ارتباط با ما
+          </button>
+          <div id="toast" class="toast">به بخش درباره ما خوش آمدید! 🍽️</div>
+          <style>
+            .toast {
+              position: fixed;
+              bottom: 20px;
+              right: 20px;
+              background: #ff7f50;
+              color: white;
+              padding: 10px 15px;
+              border-radius: 8px;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+              font-family: sans-serif;
+              opacity: 0;
+              transform: translateY(20px);
+              transition: opacity 0.4s ease, transform 0.4s ease;
+              z-index: 1000;
+            }
+            .toast.show {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          </style>
+          <script>
+            const toast = document.getElementById("toast");
+
+            document
+              .querySelector("#btn-about")
+              .addEventListener("click", () => {
+                toast.classList.add("show");
+
+                setTimeout(() => {
+                  toast.classList.remove("show");
+                }, 3000); // بعد از 3 ثانیه محو میشه
+              });
+          </script>
+        </div>
+      </div>
+
+      <!-- ویژگی‌های خاص -->
+      <div
+        style="
+          margin-top: 50px;
+          display: flex;
+          gap: 25px;
+          justify-content: center;
+          flex-wrap: wrap;
+        "
+      ></div>
+    </section>
+
+    <script>
+      // منوی اصلی - فعال کردن active روی آیتم کلیک شده
+      const menuItems = document.querySelectorAll("nav ul li");
+
+      menuItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          menuItems.forEach((i) => i.classList.remove("active"));
+          item.classList.add("active");
+        });
+      });
+
+      // بخش منوی Our Menu - تغییر دسته نمایش داده شده
+      const categoryItems = document.querySelectorAll(".category-item");
+      const menuLists = document.querySelectorAll(".menu-list");
+
+      categoryItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          // حذف active از همه دسته‌ها
+          categoryItems.forEach((c) => c.classList.remove("active"));
+          // اضافه کردن active به دسته کلیک شده
+          item.classList.add("active");
+
+          const category = item.getAttribute("data-category");
+
+          // نمایش فقط دسته انتخابی، بقیه مخفی
+          menuLists.forEach((list) => {
+            if (list.id === category) {
+              list.style.display = "flex";
+            } else {
+              list.style.display = "none";
+            }
+          });
+        });
+      });
+      const signInBtn = document.querySelector(".sign-in");
+      const signUpBtn = document.querySelector(".sign-up");
+      const signInForm = document.getElementById("sign-in-form");
+      const signUpForm = document.getElementById("sign-up-form");
+
+      function showMessage(form, message, success = false) {
+        // اگر پیام قبلی هست پاکش کن
+        let msg = form.querySelector(".message");
+        if (msg) msg.remove();
+
+        msg = document.createElement("div");
+        msg.className = "message";
+        msg.textContent = message;
+        msg.style.padding = "8px";
+        msg.style.marginTop = "8px";
+        msg.style.borderRadius = "4px";
+        msg.style.fontSize = "14px";
+        msg.style.textAlign = "center";
+        msg.style.color = success ? "green" : "red";
+        msg.style.backgroundColor = success ? "#d4edda" : "#f8d7da";
+        msg.style.border = success ? "1px solid #c3e6cb" : "1px solid #f5c6cb";
+
+        form.appendChild(msg);
+
+        if (success) {
+          // بعد 1 ثانیه پیام حذف شود و فرم بسته شود
+          setTimeout(() => {
+            msg.remove();
+            form.style.display = "none";
+          }, 1000);
+        }
+      }
+
+      signInBtn.addEventListener("click", () => {
+        if (signUpForm.style.display === "block")
+          signUpForm.style.display = "none";
+        signInForm.style.display =
+          signInForm.style.display === "block" ? "none" : "block";
+      });
+
+      signUpBtn.addEventListener("click", () => {
+        if (signInForm.style.display === "block")
+          signInForm.style.display = "none";
+        signUpForm.style.display =
+          signUpForm.style.display === "block" ? "none" : "block";
+      });
+
+      // اعتبارسنجی فرم Sign In
+      signInForm.querySelector("button").addEventListener("click", (e) => {
+        e.preventDefault();
+        const inputs = signInForm.querySelectorAll("input");
+        let valid = true;
+        inputs.forEach((input) => {
+          if (!input.value.trim()) valid = false;
+        });
+        if (!valid) {
+          showMessage(signInForm, "لطفاً فیلدها را درست پر کنید.");
+        } else {
+          showMessage(signInForm, "ورود شما با موفقیت انجام شد.", true);
+        }
+      });
+
+      // اعتبارسنجی فرم Sign Up
+      signUpForm.querySelector("button").addEventListener("click", (e) => {
+        e.preventDefault();
+        const inputs = signUpForm.querySelectorAll("input");
+        let valid = true;
+        inputs.forEach((input) => {
+          if (!input.value.trim()) valid = false;
+        });
+        if (!valid) {
+          showMessage(signUpForm, "لطفاً فیلدها را درست پر کنید.");
+        } else {
+          showMessage(signUpForm, "ثبت نام با موفقیت انجام شد.", true);
+        }
+      });
+      const btnExplore = document.querySelector(".btn-explore");
+      const ourMenuSection = document.getElementById("our-menu");
+
+      btnExplore.addEventListener("click", () => {
+        ourMenuSection.scrollIntoView({ behavior: "smooth" });
+      });
+    </script>
+  </body>
+</html>
